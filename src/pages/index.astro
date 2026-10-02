@@ -1,0 +1,122 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectBanner from '../components/ProjectBanner.astro';
+import { projects } from '../data/projects';
+import { about, education, experience, site, skills, url } from '../data/site';
+
+const featured = projects.filter((p) => p.featured);
+const more = projects.filter((p) => !p.featured);
+---
+
+<Base>
+  <section class="reel">
+    <video
+      class="reel__video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster={url('/videos/showreel.jpg')}
+      src={url('/videos/showreel.mp4')}
+      aria-hidden="true"
+      tabindex="-1"
+    ></video>
+    <div class="wrap reel__content">
+      <p class="reel__role">{site.role}</p>
+      <h1>{site.name}</h1>
+      <p class="reel__intro">{about[0]}</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="#projects">View projects</a>
+        {site.cv && <a class="btn" href={site.cv} download>Download CV</a>}
+        <a class="btn" href="#contact">Contact</a>
+      </div>
+    </div>
+    <p class="reel__credit">Gameplay footage from the projects below</p>
+  </section>
+
+  <section id="projects" class="wrap section">
+    <h2 class="title">Selected work</h2>
+    <div class="banners">
+      {featured.map((project, i) => <ProjectBanner project={project} index={i + 1} eager={i === 0} />)}
+    </div>
+
+    <h2 class="title title--sub">More projects</h2>
+    <div class="banners banners--small">
+      {more.map((project) => <ProjectBanner project={project} small />)}
+    </div>
+  </section>
+
+  <section id="about" class="wrap section">
+    <h2 class="title">About</h2>
+    <div class="about">
+      <div>
+        {about.map((paragraph) => <p class="about__lead">{paragraph}</p>)}
+
+        <h3>Skills</h3>
+        <dl class="rows">
+          {
+            skills.map((skill) => (
+              <div>
+                <dt>{skill.group}</dt>
+                <dd>{skill.items.join(', ')}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <div>
+        <h3>Experience</h3>
+        <dl class="rows rows--dated">
+          {
+            experience.map((job) => (
+              <div>
+                <dt>{job.period}</dt>
+                <dd>
+                  <strong>{job.place}</strong>
+                  <span>{job.role}</span>
+                  <span class="muted">{job.detail}</span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <h3>Education</h3>
+        <dl class="rows rows--dated">
+          {
+            education.map((item) => (
+              <div>
+                <dt>{item.period}</dt>
+                <dd>
+                  <strong>{item.title}</strong>
+                  <span class="muted">{item.place}</span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="wrap section contact">
+    <h2 class="title">Contact</h2>
+    <a class="contact__email" href={`mailto:${site.email}`}>{site.email}</a>
+    <div class="actions">
+      <a class="btn" href={site.linkedin} rel="noopener" target="_blank">LinkedIn ↗</a>
+      <a class="btn" href={site.github} rel="noopener" target="_blank">GitHub ↗</a>
+      {site.cv && <a class="btn" href={site.cv} download>Download CV</a>}
+    </div>
+  </section>
+
+  <script>
+    // Respect reduced-motion: show the poster frame instead of the looping reel.
+    const reel = document.querySelector<HTMLVideoElement>('.reel__video');
+    if (reel && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      reel.removeAttribute('autoplay');
+      reel.pause();
+    }
+  </script>
+</Base>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.netlify/
+.DS_Store
+
+# Raw source media (uncompressed, ~340 MB). The site uses the optimised copies
+# in src/assets/ and public/videos/.
+/assets/
+
+# Local tooling
+.claude/

@@ -1,0 +1,62 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { Media } from '../data/projects';
+import { url } from '../data/site';
+import { image } from '../lib/images';
+
+interface Props {
+  media: Media[];
+  columns?: 1 | 2 | 3 | 4;
+}
+
+const { media, columns = 2 } = Astro.props;
+
+const items = await Promise.all(
+  media.map(async (item) => {
+    if (item.type !== 'image') return { item, full: null };
+    const src = image(item.src);
+    const full = await getImage({ src, width: Math.min(src.width, 2200), format: 'webp' });
+    return { item, full: full.src };
+  }),
+);
+---
+
+<div class:list={['media', `media--${columns}`]}>
+  {
+    items.map(({ item, full }) => (
+      <figure class:list={{ 'media__portrait': item.type === 'video' && item.portrait }}>
+        {item.type === 'image' ? (
+          <a href={full} data-lightbox aria-label={`Enlarge image: ${item.alt}`}>
+            <Image
+              src={image(item.src)}
+              alt={item.alt}
+              widths={[480, 800, 1200]}
+              sizes={columns === 1 ? '(min-width: 1100px) 1040px, 100vw' : '(min-width: 700px) 50vw, 100vw'}
+            />
+          </a>
+        ) : item.loop ? (
+          <video
+            class="loop"
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster={url(`/videos/${item.src}.jpg`)}
+            src={url(`/videos/${item.src}.mp4`)}
+            aria-label={item.title}
+          />
+        ) : (
+          <video
+            controls
+            playsinline
+            preload="none"
+            poster={url(`/videos/${item.src}.jpg`)}
+            src={url(`/videos/${item.src}.mp4`)}
+            aria-label={item.title}
+          />
+        )}
+        {item.caption && <figcaption>{item.caption}</figcaption>}
+      </figure>
+    ))
+  }
+</div>

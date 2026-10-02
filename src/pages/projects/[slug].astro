@@ -1,0 +1,176 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import MediaGrid from '../../components/MediaGrid.astro';
+import { projects, type Project } from '../../data/projects';
+import { url } from '../../data/site';
+import { image } from '../../lib/images';
+
+export function getStaticPaths() {
+  return projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      prev: projects[(i - 1 + projects.length) % projects.length],
+      next: projects[(i + 1) % projects.length],
+    },
+  }));
+}
+
+interface Props {
+  project: Project;
+  prev: Project;
+  next: Project;
+}
+
+const { project, prev, next } = Astro.props;
+const cover = image(project.cover);
+const og = await getImage({ src: cover, width: 1200, format: 'jpg' });
+
+const facts = [
+  ['Context', project.context],
+  ['Year', project.year],
+  ['Engine', project.engine],
+  ['Team', project.team],
+  ['Duration', project.duration],
+  ['Tools', project.tools.join(', ')],
+].filter(([, value]) => value);
+---
+
+<Base title={project.title} description={project.tagline} image={og.src}>
+  <article style={`--accent: ${project.accent}`}>
+    <header class="project-hero">
+      <Image
+        class="project-hero__bg"
+        src={cover}
+        alt=""
+        widths={[640, 1024, 1600]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div class="wrap project-hero__content">
+        <a class="back" href={url('/#projects')}>← All projects</a>
+        <p class="project-hero__kind">{project.kind} · {project.context}</p>
+        <h1>{project.title}</h1>
+        <p class="project-hero__tagline">{project.tagline}</p>
+        {
+          project.links.length > 0 && (
+            <div class="actions">
+              {project.links.map((link, i) => (
+                <a class:list={['btn', { 'btn--primary': i === 0 }]} href={link.href} rel="noopener" target="_blank">
+                  {link.label} ↗
+                </a>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    <div class="wrap project-top">
+      <div class="project-top__main">
+        <h2>Overview</h2>
+        {project.overview.map((paragraph) => <p>{paragraph}</p>)}
+
+        <h2>My contributions</h2>
+        <ul class="ticks">
+          {project.contributions.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+
+      <aside class="facts" aria-label="Project details">
+        <h2>Role breakdown</h2>
+        <ul class="roles">
+          {project.roles.map((role) => <li>{role}</li>)}
+        </ul>
+        <dl class="rows">
+          {
+            facts.map(([label, value]) => (
+              <div>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+    </div>
+
+    {
+      project.sections.map((section) => (
+        <section class="wrap section project-section">
+          <h2 class="title">{section.title}</h2>
+          {(section.body || section.list || section.links) && (
+            <div class="prose">
+              {section.body?.map((paragraph) => <p>{paragraph}</p>)}
+              {section.list && (
+                <ul>
+                  {section.list.map((item) => <li>{item}</li>)}
+                </ul>
+              )}
+              {section.links && (
+                <p class="doc-links">
+                  {section.links.map((link) => (
+                    <a href={link.href} rel="noopener" target="_blank">
+                      {link.label} ↗
+                    </a>
+                  ))}
+                </p>
+              )}
+            </div>
+          )}
+          {section.media && <MediaGrid media={section.media} columns={section.columns} />}
+        </section>
+      ))
+    }
+
+    <nav class="wrap pager" aria-label="Other projects">
+      <a href={url(`/projects/${prev.slug}/`)} style={`--accent: ${prev.accent}`}>
+        <span class="muted">← Previous</span>
+        <strong>{prev.title}</strong>
+      </a>
+      <a class="pager__next" href={url(`/projects/${next.slug}/`)} style={`--accent: ${next.accent}`}>
+        <span class="muted">Next →</span>
+        <strong>{next.title}</strong>
+      </a>
+    </nav>
+  </article>
+
+  <dialog class="lightbox" aria-label="Enlarged image">
+    <img alt="" />
+    <button type="button" aria-label="Close">×</button>
+  </dialog>
+
+  <script>
+    // Lightbox: enlarge blockout/layout images in place instead of leaving the page.
+    const dialog = document.querySelector<HTMLDialogElement>('dialog.lightbox')!;
+    const target = dialog.querySelector('img')!;
+    document.querySelectorAll<HTMLAnchorElement>('a[data-lightbox]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        target.src = link.href;
+        target.alt = link.querySelector('img')?.alt ?? '';
+        dialog.showModal();
+      });
+    });
+    dialog.addEventListener('click', () => dialog.close());
+
+    // GIF-like clips: only download and play while on screen.
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) video.play().catch(() => {});
+          else video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    document.querySelectorAll<HTMLVideoElement>('video.loop').forEach((video) => {
+      if (reduceMotion) video.controls = true;
+      else observer.observe(video);
+    });
+  </script>
+</Base>

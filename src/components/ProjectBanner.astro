@@ -1,0 +1,38 @@
+---
+import { Image } from 'astro:assets';
+import type { Project } from '../data/projects';
+import { url } from '../data/site';
+import { image } from '../lib/images';
+
+interface Props {
+  project: Project;
+  /** Position in the list, shown as a large index number on wide banners. */
+  index?: number;
+  small?: boolean;
+  eager?: boolean;
+}
+
+const { project, index, small = false, eager = false } = Astro.props;
+---
+
+<a
+  class:list={['banner', { 'banner--small': small }]}
+  href={url(`/projects/${project.slug}/`)}
+  style={`--accent: ${project.accent}`}
+>
+  <Image
+    src={image(project.cover)}
+    alt=""
+    widths={small ? [480, 800] : [640, 1100, 1600]}
+    sizes={small ? '(min-width: 900px) 33vw, 100vw' : '(min-width: 1240px) 1200px, 100vw'}
+    loading={eager ? 'eager' : 'lazy'}
+  />
+  <div class="banner__content">
+    {index !== undefined && <span class="banner__index">{String(index).padStart(2, '0')}</span>}
+    <span class="banner__kind">{project.kind} · {project.context.split(' · ')[0]}</span>
+    <h3>{project.title}</h3>
+    <p class="banner__tagline">{project.tagline}</p>
+    <p class="banner__roles">{project.roles.join(' / ')}</p>
+  </div>
+  <span class="banner__cta" aria-hidden="true">View project →</span>
+</a>
