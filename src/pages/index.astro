@@ -4,7 +4,21 @@ import ProjectBanner from '../components/ProjectBanner.astro';
 import { projects } from '../data/projects';
 import { about, education, experience, site, skills, url } from '../data/site';
 
-const featured = projects.filter((p) => p.featured);
+// Order of the large banners on the home page; featured projects not listed here go last.
+const featuredOrder = [
+  'vaf-survivor',
+  'jeremia-nightfall',
+  'the-gondoliers-fugue',
+  'into-the-soundscape',
+  'sacred-vendors',
+  'save-the-dungeon',
+  'drahive',
+];
+const rank = (slug: string) => {
+  const i = featuredOrder.indexOf(slug);
+  return i === -1 ? featuredOrder.length : i;
+};
+const featured = projects.filter((p) => p.featured).sort((a, b) => rank(a.slug) - rank(b.slug));
 const more = projects.filter((p) => !p.featured);
 ---
 
