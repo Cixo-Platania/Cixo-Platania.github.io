@@ -57,7 +57,7 @@ const ogImage = image && Astro.site ? new URL(image, Astro.site).href : undefine
           <a href={`mailto:${site.email}`}>Email</a>
           <a href={site.linkedin} rel="noopener" target="_blank">LinkedIn</a>
           <a href={site.github} rel="noopener" target="_blank">GitHub</a>
-          {site.cv && <a href={site.cv} download>CV</a>}
+          {site.cv && <a href={site.cv} download={site.cvName}>CV</a>}
         </span>
       </div>
     </footer>

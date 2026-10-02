@@ -42,7 +42,7 @@ const more = projects.filter((p) => !p.featured);
       <p class="reel__intro">{about[0]}</p>
       <div class="actions">
         <a class="btn btn--primary" href="#projects">View projects</a>
-        {site.cv && <a class="btn" href={site.cv} download>Download CV</a>}
+        {site.cv && <a class="btn" href={site.cv} download={site.cvName}>Download CV</a>}
         <a class="btn" href="#contact">Contact</a>
       </div>
     </div>
@@ -121,7 +121,7 @@ const more = projects.filter((p) => !p.featured);
     <div class="actions">
       <a class="btn" href={site.linkedin} rel="noopener" target="_blank">LinkedIn ↗</a>
       <a class="btn" href={site.github} rel="noopener" target="_blank">GitHub ↗</a>
-      {site.cv && <a class="btn" href={site.cv} download>Download CV</a>}
+      {site.cv && <a class="btn" href={site.cv} download={site.cvName}>Download CV</a>}
     </div>
   </section>
 

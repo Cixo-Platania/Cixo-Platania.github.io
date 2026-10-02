@@ -1,4 +1,5 @@
-import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -6,8 +7,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 export const url = (path: string) => `${base}${path}`;
 
 // Drop the PDF at public/cv/Francesco_Platania_CV.pdf and the download
-// buttons appear automatically on the next build.
+// buttons appear automatically on the next build. The content hash in the
+// query string makes browsers and the GitHub Pages cache fetch a replaced CV
+// instead of serving the previous one.
 const CV_FILE = 'cv/Francesco_Platania_CV.pdf';
+
+function cvUrl() {
+  const path = `public/${CV_FILE}`;
+  if (!existsSync(path)) return null;
+  const hash = createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 10);
+  return url(`/${CV_FILE}?v=${hash}`);
+}
 
 export const site = {
   name: 'Francesco Platania',
@@ -17,7 +27,9 @@ export const site = {
   email: 'francesco.platania1998@gmail.com',
   linkedin: 'https://www.linkedin.com/in/francesco-platania-721036120/',
   github: 'https://github.com/Cixo-Platania',
-  cv: existsSync(`public/${CV_FILE}`) ? url(`/${CV_FILE}`) : null,
+  cv: cvUrl(),
+  /** File name the browser saves the CV as. */
+  cvName: 'Francesco_Platania_CV.pdf',
 };
 
 export const about = [
@@ -31,6 +43,12 @@ export const experience = [
     place: 'VAF Gaming Studio',
     role: 'Game design · Game programming (Unity)',
     detail: 'VAF-Survivor, VAF-Arcade, VAF-Kart, VAF-Golf, Aivar Metaland',
+  },
+  {
+    period: 'Feb – Apr 2025',
+    place: 'Bad Idea Games',
+    role: 'Game design · VFX · Puzzle design (Unity)',
+    detail: "The Gondolier's Fugue",
   },
   {
     period: '2020 – 2021',
@@ -49,7 +67,19 @@ export const education = [
 export const skills = [
   { group: 'Unity', items: ['C#', 'Shader Graph', 'Particle System'] },
   { group: 'Unreal Engine 4/5', items: ['Blueprint', 'Material Editor', 'Niagara'] },
+  { group: 'Shaders & VFX', items: ['Shaders', 'VFX', 'Materials'] },
   { group: 'Design & docs', items: ['Visual graph paper', 'Draw.io', 'Miro', 'Figma', 'G-Suite'] },
   { group: 'Production', items: ['Jira', 'Trello', 'ClickUp'] },
   { group: 'Art tools', items: ['Photoshop', 'Canva'] },
+  {
+    group: 'Soft skills',
+    items: [
+      'Teamwork',
+      'Working under pressure',
+      'Logical & creative thinking',
+      'Communication',
+      'Problem solving',
+      'Fluent English',
+    ],
+  },
 ];
