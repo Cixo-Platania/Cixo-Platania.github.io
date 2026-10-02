@@ -105,7 +105,13 @@ const more = projects.filter((p) => !p.featured);
                 <dt>{item.period}</dt>
                 <dd>
                   <strong>{item.title}</strong>
-                  <span class="muted">{item.place}</span>
+                  {item.href ? (
+                    <a class="rows__link" href={item.href} rel="noopener" target="_blank">
+                      {item.place} ↗
+                    </a>
+                  ) : (
+                    <span class="muted">{item.place}</span>
+                  )}
                 </dd>
               </div>
             ))

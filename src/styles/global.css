@@ -506,6 +506,16 @@ p {
   color: var(--text);
 }
 
+.rows__link {
+  width: fit-content;
+  color: var(--muted);
+  text-decoration-color: rgb(154 158 168 / 0.5);
+}
+
+.rows__link:hover {
+  color: var(--text);
+}
+
 .contact__email {
   display: block;
   width: fit-content;

@@ -59,9 +59,19 @@ export const experience = [
 ];
 
 export const education = [
-  { period: '2022 – 2024', title: 'Game Designer course', place: 'Digital Bros Game Academy' },
-  { period: '2019 – 2021', title: 'Game Developer certification', place: 'Nautilus Academy' },
-  { period: '2011 – 2016', title: 'High school diploma', place: 'IPSAT Rocco Chinnici' },
+  {
+    period: '2022 – 2024',
+    title: 'Game Designer course',
+    place: 'Digital Bros Game Academy',
+    href: 'https://dbgameacademy.it/',
+  },
+  {
+    period: '2019 – 2021',
+    title: 'Game Developer certification',
+    place: 'Nautilus Academy',
+    href: 'https://www.nautilus.academy/',
+  },
+  { period: '2011 – 2016', title: 'High school diploma', place: 'IPSAT Rocco Chinnici', href: undefined },
 ];
 
 export const skills = [
